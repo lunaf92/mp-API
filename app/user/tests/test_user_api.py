@@ -10,6 +10,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 CREATE_USER_URL = reverse("user:create")
+TOKEN_URL = reverse("user:token")
 
 
 def create_user(email="test@example.com", password="45Egd!!94"):
@@ -76,3 +77,81 @@ class PublicApiEndpoints(TestCase):
         payload = {"email": "test@example.com", "username": "test.user", "password": ""}
         res = self.client.post(CREATE_USER_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_login_create_token(self):
+        payload = {
+            "email": "test@example.com",
+            "username": "test.user",
+            "password": "45Egd!!94",
+        }
+        create_user(email=payload["email"], password=payload["password"])
+        res = self.client.post(
+            TOKEN_URL, data={"email": payload["email"], "password": payload["password"]}
+        )
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn("token", res.data.keys())
+
+    def test_bad_password_no_token(self):
+        create_user()
+        payload = {
+            "email": "test@example.com",
+            "password": "badpass",
+        }
+        res = self.client.post(TOKEN_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertNotIn("token", res.data.keys())
+
+    def test_bad_email_no_token(self):
+        create_user()
+        payload = {
+            "email": "notexist@example.com",
+            "password": "45Egd!!94",
+        }
+        res = self.client.post(TOKEN_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertNotIn("token", res.data.keys())
+
+    def test_no_password_no_token(self):
+        create_user()
+        payload = {
+            "email": "test@example.com",
+        }
+        res = self.client.post(TOKEN_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertNotIn("token", res.data.keys())
+
+    def test_no_email_no_token(self):
+        create_user()
+        payload = {
+            "password": "45Egd!!94",
+        }
+        res = self.client.post(TOKEN_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertNotIn("token", res.data.keys())
+
+    def test_blank_password_no_token(self):
+        create_user()
+        payload = {
+            "email": "test@example.com",
+            "password": "",
+        }
+        res = self.client.post(TOKEN_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertNotIn("token", res.data.keys())
+
+    def test_blank_email_no_token(self):
+        create_user()
+        payload = {
+            "email": "",
+            "password": "45Egd!!94",
+        }
+        res = self.client.post(TOKEN_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertNotIn("token", res.data.keys())
