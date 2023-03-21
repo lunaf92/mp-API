@@ -30,9 +30,10 @@ class PublicApiEndpoints(TestCase):
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         user = get_user_model().objects.get(email=payload["email"])
         self.assertTrue(user.check_password(payload["password"]))
-        self.assertIn(res.data, payload["email"])
-        self.assertIn(res.data, payload["username"])
-        self.assertNotIn(res.data, payload["password"])
+        self.assertIn(payload["email"], res.data.values())
+        self.assertIn(payload["username"], res.data.values())
+        self.assertNotIn(payload["password"], res.data.values())
+        self.assertNotIn("password", res.data.keys())
 
     def test_create_user_with_existing_email_field(self):
         create_user()
