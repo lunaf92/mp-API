@@ -11,10 +11,11 @@ from rest_framework.test import APIClient
 
 CREATE_USER_URL = reverse("user:create")
 TOKEN_URL = reverse("user:token")
+SELF_URL = reverse("user:self")
 
 
-def create_user(email="test@example.com", password="45Egd!!94"):
-    return get_user_model().objects.create_user(email, password)
+def create_user(email="test@example.com", password="45Egd!!94", **kwargs):
+    return get_user_model().objects.create_user(email, password, **kwargs)
 
 
 class PublicApiEndpoints(TestCase):
@@ -155,3 +156,50 @@ class PublicApiEndpoints(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertNotIn("token", res.data.keys())
+
+    def test_unauthenticated_user_forbidden_access(self):
+        res = self.client.get(SELF_URL)
+
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class PrivateEndpoints(TestCase):
+    def setUp(self) -> None:
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            email="federico@example.com",
+            password="123!!ABCabc",
+            username="federico.lunardon",
+            first_name="federico",
+            last_name="lunardon",
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_retrieve_self_page_ok(self):
+        res = self.client.get(SELF_URL)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn('username', res.data.keys())
+        self.assertIn('federico.lunardon', res.data.values())
+        self.assertIn('email', res.data.keys())
+        self.assertIn('first_name', res.data.keys())
+        self.assertIn('last_name', res.data.keys())
+        self.assertNotIn('password', res.data.keys())
+
+    def test_post_fails(self):
+        res = self.client.post(SELF_URL, {})
+
+        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+    def test_partial_update_success(self):
+        payload = {
+            "username": "lunafede92",
+            "password": "NewPasw123!!"
+        }
+        
+        self.client.patch(SELF_URL, payload)
+
+        self.user.refresh_from_db()
+        
+        self.assertEqual(self.user.username, payload["username"])
+        self.assertTrue(self.user.check_password(payload["password"]))
