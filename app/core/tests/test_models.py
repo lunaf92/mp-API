@@ -4,7 +4,7 @@ All the tests about the models
 from django.test import TestCase
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from core.models import Ingredient, Review
+from core.models import Ingredient, Review, Tag
 
 
 class UserModelTests(TestCase):
@@ -79,3 +79,9 @@ class RecipeRelatedModelTest(TestCase):
         )
         
         self.assertEqual(str(review), rtitle)
+    
+    def test_create_new_tag(self):
+        ttitle = "quick"
+        tag = Tag.objects.create(name=ttitle)
+        
+        self.assertEqual(str(tag), ttitle)

@@ -67,3 +67,14 @@ class Review(models.Model):
 
     def __str__(self):
         return self.title
+
+# class Tag(models.Model):
+
+    # name = models.CharField(_("Tag name"), max_length=50)
+
+    # class Meta:
+    #     verbose_name = _("Tag")
+    #     verbose_name_plural = _("Tags")
+
+    # def __str__(self):
+    #     return self.name
