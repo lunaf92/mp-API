@@ -94,6 +94,9 @@ class Recipe(models.Model):
     time = models.IntegerField(_("Time in minutes")),
     public = models.BooleanField(_("Is Public"), default=False),
     author = models.ForeignKey(User, verbose_name=_("Author"), on_delete=models.CASCADE, related_name='recipes')
+    ingredients = models.ManyToManyField(Ingredient, verbose_name=_("Ingredients"))
+    tags = models.ManyToManyField(Tag, verbose_name=_("Tags"))
+    reviews = models.ManyToManyField(Review, verbose_name=_("Reviews"))
 
     class Meta:
         verbose_name = _("Recipe")
