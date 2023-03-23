@@ -4,6 +4,7 @@ All the tests about the models
 from django.test import TestCase
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from core.models import Ingredient, Review
 
 
 class UserModelTests(TestCase):
@@ -60,3 +61,23 @@ class UserModelTests(TestCase):
     def test_create_superuser_without_password_fails(self):
         with self.assertRaises(ValueError):
             get_user_model().objects.create_superuser("email@example.com", "")
+
+class RecipeRelatedModelTest(TestCase):
+    
+    def test_create_new_ingredient(self):
+        iname = "pasta"
+        ingredient = Ingredient.objects.create(name=iname)
+        
+        self.assertEqual(str(ingredient), iname)
+
+    def test_create_new_review(self):
+        user = get_user_model().objects.create_user(email="test@example.com", password="123456")
+        rtitle = "pasta"
+        review = Review.objects.create(
+            title = rtitle,
+            body = "lorem ipsum blah blah",
+            rating = 5,
+            user = user,
+        )
+        
+        self.assertEqual(str(review), rtitle)

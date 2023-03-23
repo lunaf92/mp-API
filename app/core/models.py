@@ -43,3 +43,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = "email"
+
+class Ingredient(models.Model):
+    name = models.CharField(_("Ingredient"), max_length=50)
+
+    class Meta:
+        verbose_name = _("Ingredient")
+        verbose_name_plural = _("Ingredients")
+
+    def __str__(self):
+        return self.name
+
