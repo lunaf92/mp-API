@@ -78,3 +78,27 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
+class Recipe(models.Model):
+    
+    class DifficultyChoices(models.TextChoices):
+        EASY = '1', 'Easy'
+        INTERMEDIATE = '2', 'Intermediate'
+        HARD = '3', 'Hard'
+
+    title = models.CharField(_("Recipe name"), max_length=50)
+    description = models.TextField(_("Brief description"))
+    # photo for later implementation
+    difficulty = models.CharField(max_length=1, choices=DifficultyChoices.choices, default=DifficultyChoices.EASY)
+    instruction = models.TextField(_("Detailed instructions")),
+    time = models.IntegerField(_("Time in minutes")),
+    public = models.BooleanField(_("Is Public"), default=False),
+    author = models.ForeignKey(User, verbose_name=_("Author"), on_delete=models.CASCADE, related_name='recipes')
+
+    class Meta:
+        verbose_name = _("Recipe")
+        verbose_name_plural = _("Recipes")
+
+    def __str__(self):
+        return self.title
+
