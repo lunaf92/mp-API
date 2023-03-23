@@ -71,13 +71,11 @@ class RecipeRelatedModelTest(TestCase):
         self.assertEqual(str(ingredient), iname)
 
     def test_create_new_review(self):
-        user = get_user_model().objects.create_user(email="test@example.com", password="123456")
         rtitle = "pasta"
         review = Review.objects.create(
             title = rtitle,
             body = "lorem ipsum blah blah",
-            rating = 5,
-            user = user,
+            rating = 5
         )
         
         self.assertEqual(str(review), rtitle)

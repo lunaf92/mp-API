@@ -54,3 +54,16 @@ class Ingredient(models.Model):
     def __str__(self):
         return self.name
 
+class Review(models.Model):
+
+    title = models.CharField(_("Title"), max_length=140)
+    body = models.TextField(_("Body"))
+    rating = models.IntegerField(_("Rating 1-5"))
+    user = models.ManyToManyField(User, verbose_name=_("Author"))
+
+    class Meta:
+        verbose_name = _("Review")
+        verbose_name_plural = _("Reviews")
+
+    def __str__(self):
+        return self.title
